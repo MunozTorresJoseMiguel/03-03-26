@@ -1,60 +1,73 @@
 import flet as ft
-def main(page=ft.Page):
+
+def main(page: ft.Page):
     page.title = "Tu evento"
 
-    page.add(ft.Text("Hola desde UV y Flet!"))
-
-    page.add(ft.TextField(
-label="Nombre Del Evento",
-hint_text="Nombre Del evento",
-value="",
-prefix_icon=ft.Icons.PERSON,
-suffix=ft.Text(".com"),
-error=ft.Text("Campo obligatorio"),
-password=False,
-can_reveal_password=False,
-multiline=False,
-max_length=50,
-keyboard_type=ft.KeyboardType.TEXT,
-border=ft.InputBorder.OUTLINE,
-border_color=ft.Colors.BLUE,
-focused_border_color=ft.Colors.RED,
-filled=True,
-bgcolor=ft.Colors.GREY_100,
-on_change=lambda e: print(e.control.value),
-on_submit=lambda e: print("Enter presionado")
-))
-    page.add(ft.Dropdown(
-    label="Tipo de evento",
-    width=220,
-    value="Evento",
-    options=[
-        ft.DropdownOption(key="Reunion", text="Reunion"),
-        ft.DropdownOption(key="Conferencia", text="Conferencia"),
-        ft.DropdownOption(key="Taller", text="Taller")
-    ],
-))
-    page.add(ft.RadioGroup(
-        content=ft.Column([
-            ft.Radio(value="Precencial",label="Presencial"),
-            ft.Radio(value="Online",label="Online")
-        ])
-    ))
     
-    ft.Checkbox(
-        label="Requiere confirmacion",
-        value=False
+    nombre_evento = ft.TextField(
+        label="Nombre Del Evento",
+        hint_text="Ej: Conferencia Tech",
+        max_length=50,
+        border_color=ft.Colors.BLUE,
+    )
+
+    tipo_evento = ft.Dropdown(
+        label="Tipo de evento",
+        width=220,
+        options=[
+            ft.DropdownOption(key="Reunion", text="Reunion"),
+            ft.DropdownOption(key="Conferencia", text="Conferencia"),
+            ft.DropdownOption(key="Taller", text="Taller")
+        ],
+    )
+
+    modalidad = ft.RadioGroup(
+        content=ft.Column([
+            ft.Radio(value="Presencial", label="Presencial"),
+            ft.Radio(value="Online", label="Online")
+        ])
     )
     
-    page.add(ft.Image(
-src="https://picsum.photos/200/200",
-width=200,
-height=200,
+    asistencia = ft.Checkbox(label="Confirmar Asistencia", value=False)
+    
+    duracion = ft.Slider(
+        min=1, max=8, divisions=7,
+        label="{value} horas", value=1
+    )
 
-fit="cover",
-border_radius=ft.BorderRadius.all(10),
-repeat=ft.ImageRepeat.NO_REPEAT
+    
+    resumen_text = ft.Text(size=16, color=ft.Colors.BLUE_GREY_700, weight=ft.FontWeight.BOLD)
 
-))
- 
-ft.run(main)
+   
+    def mostrar_resumen(e):
+        confirmado = "Sí" if asistencia.value else "No"
+        resumen_text.value = (
+            f"📋 RESUMEN DEL EVENTO:\n"
+            f"Evento: {nombre_evento.value}\n"
+            f"Tipo: {tipo_evento.value}\n"
+            f"Modalidad: {modalidad.value}\n"
+            f"Duración: {int(duracion.value)} horas\n"
+            f"Asistencia confirmada: {confirmado}"
+        )
+        page.update() 
+
+    
+    boton_enviar = ft.ElevatedButton("Mostrar Resumen", icon=ft.Icons.SEND, on_click=mostrar_resumen)
+
+    
+    page.add(
+        ft.Text("Hola desde UV y Flet!", size=20),
+        nombre_evento,
+        tipo_evento,
+        ft.Text("Selecciona modalidad:"),
+        modalidad,
+        asistencia,
+        ft.Text("Duración estimada:"),
+        duracion,
+        ft.Image(src="https://picsum.photos", width=200, height=100, fit="cover"),
+        ft.Divider(), 
+        boton_enviar,
+        resumen_text
+    )
+
+ft.app(target=main)
